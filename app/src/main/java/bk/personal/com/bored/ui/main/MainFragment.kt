@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import bk.personal.com.bored.R
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,12 +21,12 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+//    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var tv: TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
@@ -39,6 +40,11 @@ class MainFragment : Fragment() {
         viewModel.currentItem.observe(viewLifecycleOwner, Observer {
             Log.d("BK",it.activity)
             tv.text = it.activity
+        })
+        viewModel.boredItems.observe(viewLifecycleOwner, Observer {
+            for(i in it){
+                Log.d("BK","${i.activity}")
+            }
         })
     }
 

@@ -14,10 +14,15 @@ class MainViewModel @ViewModelInject constructor(
 
     val currentItem = MutableLiveData<BoredItem>()
 
+    val boredItems = MutableLiveData<List<BoredItem>>()
+
     fun getBoredItem(){
         viewModelScope.launch {
             val a = repo.getRandomBoredItem()
             currentItem.postValue(a)
+
+           val b = repo.getMultipleBoredItems()
+           boredItems.postValue(b)
         }
     }
 }

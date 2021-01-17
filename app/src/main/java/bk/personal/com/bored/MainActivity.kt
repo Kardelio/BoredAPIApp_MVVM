@@ -21,3 +21,37 @@ class MainActivity : AppCompatActivity() {
 //        CameraSource
     }
 }
+
+
+/*
+//REPO
+var t: Int = -1
+fun getInts(amount: Int) = flow {
+    for (i in 0..amount) {
+        delay(500)
+        emit(t++)
+    }
+}
+
+//VM
+private val list = mutableListOf<Int>()
+private val _vmFlow: MutableStateFlow<List<Int>> = MutableStateFlow(list.toList())
+val vmFlow = _vmFlow.asStateFlow()
+fun getData(i : Int) = viewModelScope.launch {
+    _vmFlow.emitAll(getInts(i).filter {
+        (it > 0) && (it < 31)
+    }.map {
+        list.add(it)
+        list.toList()
+    })
+}
+
+
+//V
+viewModel.getData(amount)
+lifecycleScope.launchWhenStarted {
+    viewModel.vmFlow.collect {
+        Log.d("BEN", it.toString())
+    }
+}
+*/
