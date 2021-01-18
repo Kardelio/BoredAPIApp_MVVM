@@ -11,8 +11,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import bk.personal.com.bored.R
+import bk.personal.com.bored.ui.TinderAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
@@ -21,32 +25,53 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-//    private lateinit var viewModel: MainViewModel
+    //    private lateinit var viewModel: MainViewModel
     private val viewModel: MainViewModel by viewModels()
-    private lateinit var tv: TextView
+    private lateinit var viewPager: ViewPager2
+    private lateinit var tinderAdapter: TinderAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+//    private lateinit var adapter: Adapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        tv = view.findViewById(R.id.message)
-        view.findViewById<Button>(R.id.mybutt).setOnClickListener {
-            viewModel.getBoredItem()
-        }
+        viewPager = view.findViewById(R.id.pager)
+        tinderAdapter = TinderAdapter()
+//        viewPager.setPageTransformer(CustomPageTrans())
+        viewPager.offscreenPageLimit = 10
+        viewPager.adapter = tinderAdapter
 
-        viewModel.currentItem.observe(viewLifecycleOwner, Observer {
-            Log.d("BK",it.activity)
-            tv.text = it.activity
-        })
-        viewModel.boredItems.observe(viewLifecycleOwner, Observer {
-            for(i in it){
-                Log.d("BK","${i.activity}")
+//        view.findViewById<Button>(R.id.mybutt).setOnClickListener {
+//            viewModel.getBoredItem()
+//        }
+
+        viewModel.getData(10)
+        lifecycleScope.launchWhenStarted {
+            viewModel.boredItemsFlow.collect {
+                it.forEach { ac ->
+                    Log.d("BK", ac.activity)
+                }
+                tinderAdapter.setAllData(it)
             }
-        })
+        }
     }
+
+   inner class CustomPageTrans: ViewPager2.PageTransformer{
+       override fun transformPage(page: View, position: Float) {
+            if(position >= 0){
+                page.scaleX = 0.8f - (0.02f * position)
+                page.scaleY = 0.8f
+                page.translationX = - page.width * position
+                page.translationY = - (20 * position)
+            }
+       }
+   }
 
 //    override fun onActivityCreated(savedInstanceState: Bundle?) {
 //        super.onActivityCreated(savedInstanceState)
